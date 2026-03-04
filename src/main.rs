@@ -545,17 +545,26 @@ impl MathExpressionParser {
         info_log!("Starting evaluation");
         let result = self.evaluate_e()?; // Parses and evaluates a full expression.
 
-        // Checks whether an '=' symbol (expected) is present after the expression.
-        match self.peek() {
-            Some(&Token::Equals) => {
-                info_log!("Evaluation completed successfully");
-                Ok(result)
-            },
+        // Requires '=' after the expression, consumes it,
+        // then verifies no trailing tokens remain.
+        match self.next() {
+            Some(Token::Equals) => {
+                match self.peek() {
+                    Some(token) => {
+                        error_log!("Unexpected trailing token after '=': {:?}", token);
+                        Err(TokenError::UnexpectedToken(*token).into())
+                    }
+                    None => {
+                        info_log!("Evaluation completed successfully");
+                        Ok(result)
+                    }
+                }
+            }
             Some(token) => {
                 // Error: unexpected token after end of expression.
                 error_log!("Unexpected token after evaluation: {:?}", token);
-                Err(TokenError::UnexpectedToken(*token).into())
-            },
+                Err(TokenError::UnexpectedToken(token).into())
+            }
             None => {
                 // Error: expression ended without an explicit '='.
                 error_log!("Incomplete expression at end");
