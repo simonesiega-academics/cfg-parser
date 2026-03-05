@@ -87,6 +87,20 @@ docker run --rm mathsolver
 - Executes the binary.
 - `--rm` auto-removes the container after exit.
 
+### Run with custom input expression
+
+Pass the expression as CLI arguments:
+
+```bash
+docker run --rm mathsolver "(1 + 2) * 3 ="
+```
+
+Or use environment variable `MATHSOLVER_INPUT`:
+
+```bash
+docker run --rm -e MATHSOLVER_INPUT="27 $ 3 =" mathsolver
+```
+
 ### Run without auto-removal (for inspection)
 
 ```bash
@@ -119,6 +133,12 @@ docker compose up --build
 
 ```bash
 docker compose up
+```
+
+### Compose with custom input
+
+```bash
+MATHSOLVER_INPUT="2(3+4)=" docker compose run --rm mathsolver
 ```
 
 ### Stop and clean compose resources

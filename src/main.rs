@@ -1,5 +1,4 @@
-#[allow(unused)]
-use std::io::{self, Write};
+use std::env;
 
 /// # Custom logging macros for debug and release
 ///
@@ -1130,10 +1129,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     */
     
-    let input = "(3 + 5 * (2 - 3) ^ 2) / (4 - 1) + -2 * (5 + 2) ^ 3 - 10 ="; // = -693.333 CORRECT
+    let input = resolve_input_expression();
     info_log!("Input expression: {}", input);
 
-    let mut tokenizer = Tokenizer::new(input);
+    let mut tokenizer = Tokenizer::new(&input);
 
     let result = match tokenizer.tokenize() {
         Ok(tokens) => {
@@ -1162,4 +1161,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     }
+}
+
+const DEFAULT_INPUT: &str = "(3 + 5 * (2 - 3) ^ 2) / (4 - 1) + -2 * (5 + 2) ^ 3 - 10 =";
+
+fn resolve_input_expression() -> String {
+    let args: Vec<String> = env::args().skip(1).collect();
+
+    if !args.is_empty() {
+        return args.join(" ");
+    }
+
+    if let Ok(input) = env::var("MATHSOLVER_INPUT") {
+        if !input.trim().is_empty() {
+            return input;
+        }
+    }
+
+    DEFAULT_INPUT.to_string()
 }
